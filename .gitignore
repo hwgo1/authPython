@@ -63,5 +63,8 @@ env/
 .env
 .env.local
 
+# Database
+*.db
+
 # Project specific
 *.log
