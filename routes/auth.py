@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException
 import bcrypt
 from schemas.user import UserRegister, UserLogin
+from schemas.auth import Token
 from models import User
+from utils.security import create_JWT_token
 
 router = APIRouter()
 
@@ -38,7 +40,7 @@ def register_user(user_data: UserRegister) -> dict:
     return {"message": "Usuário criado com sucesso!"}
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 def login_user(user_data: UserLogin) -> dict:
     """Login user with validated credentials and return session token."""
 
@@ -58,4 +60,9 @@ def login_user(user_data: UserLogin) -> dict:
     ):
         raise HTTPException(status_code=401, detail="Credenciais inválidas.")
 
-    return {"message": "Login realizado com sucesso!"}
+    token_data = {"id": str(user.id), "email": user.email}
+
+    # Create JWT token
+    JWT_token = create_JWT_token(data=token_data)
+
+    return Token(access_token=JWT_token, token_type="bearer")

@@ -3,3 +3,4 @@ peewee==3.17.8
 python-dotenv==1.0.1
 bcrypt
 uvicorn
+pyjwt
