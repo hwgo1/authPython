@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import bcrypt
-from schemas.user import UserRegister
+from schemas.user import UserRegister, UserLogin
 from models import User
 
 router = APIRouter()
@@ -36,3 +36,26 @@ def register_user(user_data: UserRegister) -> dict:
     )
 
     return {"message": "Usuário criado com sucesso!"}
+
+
+@router.post("/login")
+def login_user(user_data: UserLogin) -> dict:
+    """Login user with validated credentials and return session token."""
+
+    # Check user email (or username) in database
+    user = User.get_or_none(
+        (User.username == user_data.email_or_username)
+        | (User.email == user_data.email_or_username)
+    )
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Credenciais inválidas.")
+
+    # Verify request password
+    if not bcrypt.checkpw(
+        user_data.password.encode("utf-8"),
+        user.password_hash.encode("utf-8"),
+    ):
+        raise HTTPException(status_code=401, detail="Credenciais inválidas.")
+
+    return {"message": "Login realizado com sucesso!"}

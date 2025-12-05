@@ -21,3 +21,10 @@ class UserRegister(BaseModel):
             raise ValueError("Senha deve conter pelo menos 1 letra maiúscula")
 
         return v
+
+
+class UserLogin(BaseModel):
+    """User Login schema with validation"""
+
+    email_or_username: str
+    password: str
