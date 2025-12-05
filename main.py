@@ -1,13 +1,13 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from models import db, User
+from models import db, User, RefreshToken
 from routes.auth import router as auth_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db.connect()
-    db.create_tables([User], safe=True)
+    db.create_tables([User, RefreshToken], safe=True)
     print("✅ Table created!")
     yield
     db.close()
