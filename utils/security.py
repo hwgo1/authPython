@@ -3,6 +3,8 @@ import os
 from jwt.exceptions import InvalidTokenError
 from dotenv import load_dotenv
 from datetime import timedelta, datetime, timezone
+from uuid import uuid4
+from models import RefreshToken
 
 load_dotenv()
 
@@ -51,3 +53,16 @@ def decode_JWT_token(token: str) -> dict:
         return payload
     except InvalidTokenError:
         raise
+
+
+def create_refresh_token(user_id) -> str:
+    """
+    Generate and store a refresh token for the authenticated user.
+
+    Args:
+        user_id: ID of the user for whom the token is created
+    """
+    token = str(uuid4())
+    expires = datetime.now(timezone.utc) + timedelta(days=7)
+    RefreshToken.create(token=token, user_id=user_id, expires_at=expires)
+    return token

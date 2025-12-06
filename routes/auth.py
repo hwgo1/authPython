@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException
 import bcrypt
 from schemas.user import UserRegister, UserLogin
 from schemas.auth import Token
-from models import User
-from utils.security import create_JWT_token
+from models import User, RefreshToken
+from utils.security import create_JWT_token, create_refresh_token
 
 router = APIRouter()
 
@@ -41,8 +41,8 @@ def register_user(user_data: UserRegister) -> dict:
 
 
 @router.post("/login", response_model=Token)
-def login_user(user_data: UserLogin) -> dict:
-    """Login user with validated credentials and return session token."""
+def login_user(user_data: UserLogin) -> Token:
+    """Login user with validated credentials and return session tokens."""
 
     # Check user email (or username) in database
     user = User.get_or_none(
@@ -65,4 +65,9 @@ def login_user(user_data: UserLogin) -> dict:
     # Create JWT token
     JWT_token = create_JWT_token(data=token_data)
 
-    return Token(access_token=JWT_token, token_type="bearer")
+    # Create Refresh token
+    refresh_token = create_refresh_token(user.id)
+
+    return Token(
+        access_token=JWT_token, refresh_token=refresh_token, token_type="bearer"
+    )
