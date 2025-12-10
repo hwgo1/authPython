@@ -24,12 +24,30 @@ This is a **learning project** where I'm building a production-grade authenticat
 - Uniqueness checks (email and username)
 - Secure password hashing with bcrypt
 
-### TODO: Login & Tokens (In Progress)
+### ✅ Login & Token System
 
-- Login endpoint with credential verification
+- `POST /api/login` endpoint with credential verification
 - JWT access tokens
 - Refresh tokens
-- Token-based authentication
+- Secure password verification with bcrypt
+
+### ✅ Protected Routes
+
+- `GET /api/me` endpoint for current user data
+- Automatic token extraction from Authorization header
+- Token validation with expiration checking
+- Swagger UI integration with "Authorize" button
+
+### TODO
+
+- Token refresh mechanism (`POST /api/refresh`)
+- Logout functionality with token invalidation
+- Email verification system
+- Password reset flow
+- Rate limiting for brute-force protection
+- 2FA
+- Audit logging for security events
+- Test suite (pytest)
 
 ## Project Structure
 

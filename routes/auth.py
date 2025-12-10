@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 import bcrypt
-from schemas.user import UserRegister, UserLogin
+from schemas.user import UserRegister, UserLogin, UserResponse
 from schemas.auth import Token
-from models import User, RefreshToken
-from utils.security import create_JWT_token, create_refresh_token
+from models import User
+from utils.security import create_JWT_token, create_refresh_token, get_current_user
 
 router = APIRouter()
 
@@ -70,4 +70,15 @@ def login_user(user_data: UserLogin) -> Token:
 
     return Token(
         access_token=JWT_token, refresh_token=refresh_token, token_type="bearer"
+    )
+
+
+@router.get("/me", response_model=UserResponse)
+def read_me(current_user: User = Depends(get_current_user)) -> UserResponse:
+    """Get current authenticated user information."""
+    return UserResponse(
+        id=str(current_user.id),
+        username=current_user.username,
+        email=current_user.email,
+        created_at=current_user.created_at,
     )

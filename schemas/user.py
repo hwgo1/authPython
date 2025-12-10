@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, field_validator
 
 
@@ -28,3 +29,15 @@ class UserLogin(BaseModel):
 
     email_or_username: str
     password: str
+
+
+class UserResponse(BaseModel):
+    """User response schema (without password)"""
+
+    id: str
+    username: str
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
