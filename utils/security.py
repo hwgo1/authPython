@@ -85,3 +85,41 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
     return current_user
+
+
+def validate_refresh_token(body_token: str) -> str:
+    """
+    Validate refresh token and generate new access token.
+
+    Args:
+        body_token: Refresh token string from request
+    """
+
+    refresh_token = RefreshToken.get_or_none(RefreshToken.token == body_token)
+
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Token enviado não existe")
+
+    expires_at = refresh_token.expires_at
+    if isinstance(expires_at, str):
+
+        expires_at = datetime.strptime(expires_at, "%Y-%m-%d %H:%M:%S.%f%z")
+
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=401,
+            detail="Token enviado já foi expirado. Faça Login novamente",
+        )
+
+    user = refresh_token.user
+
+    if not user:
+        raise HTTPException(
+            status_code=401, detail="Nenhum usuário associado ao token enviado."
+        )
+
+    token_data = {"id": str(user.id), "email": user.email}
+
+    new_access_token = create_JWT_token(token_data)
+
+    return new_access_token

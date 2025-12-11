@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 import bcrypt
 from schemas.user import UserRegister, UserLogin, UserResponse
-from schemas.auth import Token
+from schemas.auth import Token, RefreshTokenRequest, RefreshTokenResponse
 from models import User
-from utils.security import create_JWT_token, create_refresh_token, get_current_user
+from utils.security import (
+    create_JWT_token,
+    create_refresh_token,
+    get_current_user,
+    validate_refresh_token,
+)
 
 router = APIRouter()
 
@@ -71,6 +76,14 @@ def login_user(user_data: UserLogin) -> Token:
     return Token(
         access_token=JWT_token, refresh_token=refresh_token, token_type="bearer"
     )
+
+
+@router.post("/refresh", response_model=RefreshTokenResponse)
+def refresh_token(body: RefreshTokenRequest) -> RefreshTokenResponse:
+    """Validate and refresh access token using a valid refresh token"""
+    new_access_token = validate_refresh_token(body.refresh_token)
+
+    return RefreshTokenResponse(access_token=new_access_token, token_type="bearer")
 
 
 @router.get("/me", response_model=UserResponse)

@@ -8,7 +8,6 @@ from routes.auth import router as auth_router
 async def lifespan(app: FastAPI):
     db.connect()
     db.create_tables([User, RefreshToken], safe=True)
-    print("✅ Table created!")
     yield
     db.close()
 
